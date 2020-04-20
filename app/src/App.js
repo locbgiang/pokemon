@@ -3,20 +3,42 @@ import axios from 'axios';
 import './App.css';
 
 function App() {
-  const [ state, setState ] = useState({
-    pokemon: [{name: 'loc'}]
+  const [state, setState] = useState({
+    pokemon: [{}]
   });
-  useEffect(()=>{
-    axios.get('https://pokeapi.co/api/v2/pokemon/1/')
-      .then(res=>{
-        setState({pokemon:[...state.pokemon,{name: res.data.name}]})
-    })
-  },[])
-  console.log(state.pokemon[0].name);
+  useEffect(() => {
+    for (let page = 1; page < 10; page++) {
+
+      axios.get(`https://pokeapi.co/api/v2/pokemon/${page}/`)
+        .then(res => {
+          console.log('number ', page);
+          setState({
+            ...state,
+            pokemon: [
+              ...state.pokemon,
+              {
+                name: res.data.name,
+                pokedex: res.data.id,
+                look: res.data.sprites.front_default,
+                stats: {
+                  speed: res.data.stats[0].base_stat,
+                  special_defense: res.data.stats[1].base_stat,
+                  special_attack: res.data.stats[2].base_stat,
+                  defense: res.data.stats[3].base_stat,
+                  attack: res.data.stats[4].base_stat,
+                  hitpoint: res.data.stats[5].base_stat
+                }
+              }
+            ]
+          });
+        });
+    }
+  }, []);
+  console.log(state.pokemon);
   //console.log(state.pokemon[1].name);
   return (
     <div className="App">
-      fdafdafd
+      {JSON.stringify(state, null, 2)}
     </div>
   );
 }
